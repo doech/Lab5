@@ -18,6 +18,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            com.example.lab5.ui.theme.Lab5Theme {
+                com.example.lab5.navigation.AppNavHost()
+            }
             Lab5Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(

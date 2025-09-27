@@ -2,12 +2,12 @@
 Ale Sierra #24405
 
 ## 📦 Estructura y archivos: ##
-data/model: define “cómo son” los datos que vienen de la API (clases de datos que reflejan el JSON).
-data/remote: concentra todo lo relacionado con red: la base URL y la interfaz de la API. Así, si cambia el proveedor o las rutas, solo se toca aquí.
-data/repository: actúa como puente entre la red y la UI. Llama a la API y adapta la respuesta para que la pantalla la use fácil (por ejemplo, calculando el id del Pokémon o armando URLs de imagen).
-ui/list y ui/detail: cada pantalla con su propio ViewModel y su estado. La UI no sabe de HTTP ni de hilos: solo pinta “loading / datos / error”.
-navigation: define rutas y el gráfico de navegación (el “mapa” de pantallas).
-MainActivity: es el punto de entrada y solo monta el NavHost dentro del tema; no hace lógica de negocio.
+* data/model: define “cómo son” los datos que vienen de la API (clases de datos que reflejan el JSON).
+* data/remote: concentra todo lo relacionado con red: la base URL y la interfaz de la API. Así, si cambia el proveedor o las rutas, solo se toca aquí.
+* data/repository: actúa como puente entre la red y la UI. Llama a la API y adapta la respuesta para que la pantalla la use fácil (por ejemplo, calculando el id del Pokémon o armando URLs de imagen).
+* ui/list y ui/detail: cada pantalla con su propio ViewModel y su estado. La UI no sabe de HTTP ni de hilos: solo pinta “loading / datos / error”.
+* navigation: define rutas y el gráfico de navegación (el “mapa” de pantallas).
+* MainActivity: es el punto de entrada y solo monta el NavHost dentro del tema; no hace lógica de negocio.
 
 
 ## 🧭 ¿Cómo usé Navigation (Compose)? ##

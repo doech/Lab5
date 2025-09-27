@@ -13,7 +13,6 @@ import com.example.lab5.ui.detail.PokemonDetailViewModel
 import com.example.lab5.ui.list.PokemonListScreen
 import com.example.lab5.ui.list.PokemonListViewModel
 
-
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()

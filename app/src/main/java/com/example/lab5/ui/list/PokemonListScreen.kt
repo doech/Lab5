@@ -1,48 +1,43 @@
 package com.example.lab5.ui.list
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lab5.ui.detail.ErrorView
+import com.example.lab5.ui.detail.LoaderView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokemonListScreen(
-    state: ListUiState,
-    onItemClick: (String) -> Unit
+    vm: PokemonListViewModel = viewModel(),
+    onOpenDetail: (String) -> Unit
 ) {
-    Scaffold(topBar = { TopAppBar(title = { Text("MainFragment") }) }) { padding ->
-        Box(Modifier.padding(padding).fillMaxSize()) {
-            when {
-                state.loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                state.error != null -> Text(state.error, Modifier.align(Alignment.Center))
-                else -> LazyColumn(Modifier.fillMaxSize()) {
-                    items(state.pokemons) { p ->
-                        Card(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .clickable { onItemClick(p.name.lowercase()) }
-                        ) {
-                            Row(
-                                Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                AsyncImage(model = p.imageUrl, contentDescription = p.name, modifier = Modifier.size(48.dp))
-                                Spacer(Modifier.width(12.dp))
-                                Text(p.name, style = MaterialTheme.typography.bodyLarge)
-                            }
-                        }
-                    }
-                }
-            }
+    val state by vm.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) { vm.load() }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("MainFragment") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+    ) { inner ->
+        when {
+            state.loading      -> LoaderView()
+            state.error != null-> ErrorView(state.error!!) { vm.load() }
+            else               -> PokemonListContent(
+                items = state.pokemons,
+                onOpenDetail = onOpenDetail,
+                modifier = Modifier.padding(inner)
+            )
         }
     }
 }
-

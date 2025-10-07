@@ -57,4 +57,13 @@ dependencies {
 
     // Coil para imágenes en Compose
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    //para errores
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.foundation.layout) // ícono back (opcional)
+
 }

@@ -1,41 +1,34 @@
 package com.example.lab5.ui.detail
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lab5.data.model.Sprites
+import com.example.lab5.data.repository.AppResult
+import com.example.lab5.data.model.PokemonDetailsResponse
 import com.example.lab5.data.repository.PokemonRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
+import com.example.lab5.data.repository.PokemonRepositoryImpl
 data class DetailUiState(
     val loading: Boolean = false,
-    val name: String = "",
-    val sprites: Sprites? = null,
+    val details: PokemonDetailsResponse? = null,
     val error: String? = null
 )
 
 class PokemonDetailViewModel(
-    private val repo: PokemonRepository = PokemonRepository()
+    private val repo: PokemonRepository = PokemonRepositoryImpl()
 ) : ViewModel() {
 
-    var state by mutableStateOf(DetailUiState())
-        private set
+    private val _state = MutableStateFlow(DetailUiState())
+    val state: StateFlow<DetailUiState> = _state.asStateFlow()
 
-    fun load(name: String) {
-        viewModelScope.launch {
-            state = state.copy(loading = true, error = null)
-            try {
-                val details = repo.getPokemonDetails(name)
-                state = state.copy(
-                    loading = false,
-                    name = name.replaceFirstChar { it.titlecase() },
-                    sprites = details.sprites
-                )
-            } catch (e: Exception) {
-                state = state.copy(loading = false, error = e.message ?: "Error desconocido")
-            }
+    fun load(nameOrId: String) = viewModelScope.launch {
+        _state.update { it.copy(loading = true, error = null) }
+        when (val res = repo.getPokemonDetails(nameOrId)) {
+            is AppResult.Success -> _state.update { it.copy(loading = false, details = res.value) }
+            is AppResult.Error   -> _state.update { it.copy(loading = false, error = res.message ?: "Error") }
         }
     }
 }

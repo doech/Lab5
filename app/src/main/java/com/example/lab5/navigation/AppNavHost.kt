@@ -22,8 +22,8 @@ fun AppNavHost() {
         composable(Routes.List.route) {
             val vm: PokemonListViewModel = viewModel()
             PokemonListScreen(
-                state = vm.state,
-                onItemClick = { name -> navController.navigate(Routes.Detail.create(name)) }
+                vm = vm,
+                onOpenDetail = { name -> navController.navigate(Routes.Detail.create(name)) }
             )
         }
 
@@ -33,8 +33,7 @@ fun AppNavHost() {
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name")!!
             val vm: PokemonDetailViewModel = viewModel()
-            LaunchedEffect(name) { vm.load(name) }
-            PokemonDetailScreen(state = vm.state, onBack = { navController.navigateUp() })
+            PokemonDetailScreen(nameOrId = name, vm = vm, onBack = { navController.navigateUp() })
         }
     }
 }

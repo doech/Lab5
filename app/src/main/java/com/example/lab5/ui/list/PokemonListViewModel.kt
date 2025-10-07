@@ -1,13 +1,17 @@
 package com.example.lab5.ui.list
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lab5.data.model.PokemonListEntry
+import com.example.lab5.data.repository.AppResult
 import com.example.lab5.data.repository.PokemonRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.lab5.data.model.PokemonListEntry
+import com.example.lab5.data.repository.PokemonRepositoryImpl
+
 
 data class ListUiState(
     val loading: Boolean = false,
@@ -16,23 +20,17 @@ data class ListUiState(
 )
 
 class PokemonListViewModel(
-    private val repo: PokemonRepository = PokemonRepository()
+    private val repo: PokemonRepository = PokemonRepositoryImpl()
 ) : ViewModel() {
 
-    var state by mutableStateOf(ListUiState())
-        private set
+    private val _state = MutableStateFlow(ListUiState())
+    val state: StateFlow<ListUiState> = _state.asStateFlow()
 
-    init { load() }
-
-    fun load() {
-        viewModelScope.launch {
-            state = state.copy(loading = true, error = null)
-            try {
-                val list = repo.getPokemonListFirst100()
-                state = state.copy(loading = false, pokemons = list)
-            } catch (e: Exception) {
-                state = state.copy(loading = false, error = e.message ?: "Error desconocido")
-            }
+    fun load() = viewModelScope.launch {
+        _state.update { it.copy(loading = true, error = null) }
+        when (val res = repo.getPokemonListFirst100()) {
+            is AppResult.Success -> _state.update { it.copy(loading = false, pokemons = res.value) }
+            is AppResult.Error   -> _state.update { it.copy(loading = false, error = res.message ?: "Error") }
         }
     }
 }
